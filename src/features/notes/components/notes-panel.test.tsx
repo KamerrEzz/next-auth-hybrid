@@ -1,0 +1,30 @@
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { vi, describe, it, expect } from "vitest";
+import { api } from "@/lib/api";
+import NotesPanel from "./notes-panel";
+
+function wrapper(ui: React.ReactNode) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return <QueryClientProvider client={client}>{ui}</QueryClientProvider>;
+}
+
+describe("NotesPanel", () => {
+  it("crea una nota desde el formulario", async () => {
+    vi.spyOn(api, "get").mockImplementation(async (url: string) => {
+      if (url.startsWith("/notes")) return { data: [] } as any;
+      if (url === "/auth/csrf") return { data: {} } as any;
+      return { data: {} } as any;
+    });
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({} as any);
+
+    render(wrapper(<NotesPanel />));
+    await waitFor(() => expect(screen.getByText(/Notas/)).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText("Título"), { target: { value: "Mi título" } });
+    fireEvent.change(screen.getByPlaceholderText("Contenido"), { target: { value: "Mi contenido" } });
+    fireEvent.click(screen.getByText("Crear"));
+
+    await waitFor(() => expect(postSpy).toHaveBeenCalledWith("/notes", { title: "Mi título", content: "Mi contenido", secure: false }));
+  });
+});
