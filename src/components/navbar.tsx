@@ -1,14 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import LogoutButton from "@/components/logout-button";
+import { useMe } from "@/features/auth/hooks/useMe";
+import LogoutButton from "@/features/auth/components/logout-button";
 
 export default function Navbar() {
-  const me = useQuery({
-    queryKey: ["me-client"],
-    queryFn: async () => (await api.get("/auth/me")).data,
-  });
+  const me = useMe();
 
   return (
     <header className="w-full border-b">

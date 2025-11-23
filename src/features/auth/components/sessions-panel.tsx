@@ -1,48 +1,39 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { useSessions } from "@/features/auth/hooks/useSessions";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-type Session = { id: string; ipAddress: string; userAgent: string; lastActive: number };
-type SessionsResponse = { currentId: string; items: Session[] };
 export default function SessionsPanel() {
-  const list = useQuery<SessionsResponse>({
-    queryKey: ["sessions"],
-    queryFn: async () => (await api.get<SessionsResponse>("/auth/sessions")).data,
-  });
+  const { query: list, revokeAll, revokeOthers, revoke } = useSessions();
   const [busy, setBusy] = useState<string | null>(null);
 
-  const revokeAll = async () => {
+  const onRevokeAll = async () => {
     try {
       setBusy("all");
-      await api.delete("/auth/sessions");
+      await revokeAll();
       toast.success("Todas las sesiones revocadas");
     } finally {
       setBusy(null);
-      list.refetch();
     }
   };
-  const revokeOthers = async () => {
+  const onRevokeOthers = async () => {
     try {
       setBusy("others");
-      await api.delete("/auth/sessions/others");
+      await revokeOthers();
       toast.success("Sesiones no actuales revocadas");
     } finally {
       setBusy(null);
-      list.refetch();
     }
   };
 
-  const revoke = async (id: string) => {
+  const onRevoke = async (id: string) => {
     try {
       setBusy(id);
-      await api.delete(`/auth/sessions/${id}`);
+      await revoke(id);
       toast.success("Sesión revocada");
     } finally {
       setBusy(null);
-      list.refetch();
     }
   };
 
@@ -51,8 +42,8 @@ export default function SessionsPanel() {
       <div className="flex items-center justify-between">
         <div className="font-medium">Sesiones</div>
         <div className="flex gap-2">
-          <Button onClick={revokeOthers} variant="outline" disabled={busy === "others" || list.isPending}>Cerrar otras</Button>
-          <Button onClick={revokeAll} variant="destructive" disabled={busy === "all" || list.isPending}>Revocar todas</Button>
+          <Button onClick={onRevokeOthers} variant="outline" disabled={busy === "others" || list.isPending}>Cerrar otras</Button>
+          <Button onClick={onRevokeAll} variant="destructive" disabled={busy === "all" || list.isPending}>Revocar todas</Button>
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -62,7 +53,7 @@ export default function SessionsPanel() {
               {s.ipAddress} • {s.userAgent} • {new Date(s.lastActive).toLocaleString()}
               {s.id === list.data?.currentId ? " • Actual" : ""}
             </div>
-            <Button onClick={() => revoke(s.id)} variant="outline" disabled={busy === s.id || list.isPending || s.id === list.data?.currentId}>Revocar</Button>
+            <Button onClick={() => onRevoke(s.id)} variant="outline" disabled={busy === s.id || list.isPending || s.id === list.data?.currentId}>Revocar</Button>
           </div>
         ))}
         {list.isPending && <div className="text-sm">Cargando...</div>}

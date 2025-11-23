@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useNotes } from "@/features/notes/hooks/useNotes";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -14,14 +14,10 @@ const CreateSchema = z.object({
   secure: z.boolean().optional(),
 });
 
-type Note = { id: string; userId: string; title: string; content: string; secure: boolean; createdAt: number; updatedAt: number };
 
 export default function NotesPanel() {
   const [totpCode, setTotpCode] = useState("");
-  const list = useQuery<Note[]>({
-    queryKey: ["notes", totpCode],
-    queryFn: async () => (await api.get<Note[]>(`/notes${totpCode ? `?totpCode=${encodeURIComponent(totpCode)}` : ""}`)).data,
-  });
+  const notes = useNotes(totpCode);
 
   const { register, handleSubmit, formState, reset } = useForm<z.infer<typeof CreateSchema>>({ resolver: zodResolver(CreateSchema) });
 
@@ -31,10 +27,9 @@ export default function NotesPanel() {
 
   const onSubmit = async (values: z.infer<typeof CreateSchema>) => {
     try {
-      await api.post("/notes", values);
+      await notes.create(values);
       toast.success("Nota creada");
       reset();
-      list.refetch();
     } catch {
       toast.error("Error al crear nota");
     }
@@ -46,7 +41,7 @@ export default function NotesPanel() {
         <div className="font-medium">Notas</div>
         <div className="flex gap-2 items-center">
           <input className="border rounded px-2 py-1 text-sm" placeholder="TOTP opcional" value={totpCode} onChange={(e) => setTotpCode(e.target.value)} />
-          <Button variant="outline" onClick={() => list.refetch()} disabled={list.isPending}>Refrescar</Button>
+          <Button variant="outline" onClick={() => notes.query.refetch()} disabled={notes.query.isPending}>Refrescar</Button>
         </div>
       </div>
 
@@ -61,9 +56,9 @@ export default function NotesPanel() {
       </form>
 
       <div className="flex flex-col gap-2">
-        {list.isPending && <div className="text-sm">Cargando...</div>}
-        {list.isError && <div className="text-sm text-red-600">Error al cargar notas</div>}
-        {(list.data ?? []).map((n) => (
+        {notes.query.isPending && <div className="text-sm">Cargando...</div>}
+        {notes.query.isError && <div className="text-sm text-red-600">Error al cargar notas</div>}
+        {(notes.query.data ?? []).map((n) => (
           <div key={n.id} className={`border rounded p-2 ${n.secure ? "bg-accent/30" : ""}`}>
             <div className="text-sm font-medium flex items-center justify-between">
               <span>{n.title}</span>
@@ -72,7 +67,7 @@ export default function NotesPanel() {
             <div className="text-xs whitespace-pre-wrap mt-1">{n.content}</div>
           </div>
         ))}
-        {!list.isPending && !(list.data?.length) && <div className="text-sm">Sin notas</div>}
+        {!notes.query.isPending && !(notes.query.data?.length) && <div className="text-sm">Sin notas</div>}
       </div>
     </div>
   );

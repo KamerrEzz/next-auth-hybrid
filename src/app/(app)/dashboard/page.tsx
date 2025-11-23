@@ -48,8 +48,8 @@ export default async function DashboardPage() {
   );
 }
 
-import ChangePassword from "@/components/change-password";
-import LogoutButton from "@/components/logout-button";
-import TwofaPanel from "@/components/twofa-panel";
-import SessionsPanel from "@/components/sessions-panel";
-import NotesPanel from "@/components/notes-panel";
+import ChangePassword from "@/features/auth/components/change-password";
+import LogoutButton from "@/features/auth/components/logout-button";
+import TwofaPanel from "@/features/auth/components/twofa-panel";
+import SessionsPanel from "@/features/auth/components/sessions-panel";
+import NotesPanel from "@/features/notes/components/notes-panel";
