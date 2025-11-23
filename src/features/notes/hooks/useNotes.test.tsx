@@ -11,10 +11,10 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 describe("useNotes", () => {
   it("lista y crea notas", async () => {
-    const getSpy = vi.spyOn(api, "get").mockResolvedValue({
-      data: [],
-    } as any);
-    const postSpy = vi.spyOn(api, "post").mockResolvedValue({} as any);
+    const getSpy = vi
+      .spyOn(api, "get")
+      .mockResolvedValue({ data: [] } as unknown as Promise<{ data: unknown[] }>);
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({} as unknown as Promise<unknown>);
 
     const { result } = renderHook(() => useNotes(""), { wrapper });
     await waitFor(() => expect(result.current.query.isSuccess).toBe(true));
@@ -22,5 +22,6 @@ describe("useNotes", () => {
 
     await result.current.create({ title: "t", content: "c" });
     expect(postSpy).toHaveBeenCalledWith("/notes", { title: "t", content: "c" });
+    expect(getSpy).toHaveBeenCalled();
   });
 });

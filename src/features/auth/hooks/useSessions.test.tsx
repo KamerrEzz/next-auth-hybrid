@@ -11,10 +11,12 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 describe("useSessions", () => {
   it("lista y revoca sesiones", async () => {
-    const getSpy = vi.spyOn(api, "get").mockResolvedValue({
-      data: { currentId: "c1", items: [{ id: "c1", ipAddress: "1.2.3.4", userAgent: "UA", lastActive: Date.now() }] },
-    } as any);
-    const delSpy = vi.spyOn(api, "delete").mockResolvedValue({} as any);
+    const getSpy = vi
+      .spyOn(api, "get")
+      .mockResolvedValue({
+        data: { currentId: "c1", items: [{ id: "c1", ipAddress: "1.2.3.4", userAgent: "UA", lastActive: Date.now() }] },
+      } as unknown as Promise<{ data: { currentId: string; items: { id: string; ipAddress: string; userAgent: string; lastActive: number }[] } }>);
+    const delSpy = vi.spyOn(api, "delete").mockResolvedValue({} as unknown as Promise<unknown>);
 
     const { result } = renderHook(() => useSessions(), { wrapper });
     await waitFor(() => expect(result.current.query.isSuccess).toBe(true));

@@ -11,7 +11,9 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 describe("useMe", () => {
   it("obtiene el usuario actual", async () => {
-    const spy = vi.spyOn(api, "get").mockResolvedValueOnce({ data: { id: "u1", email: "test@example.com" } } as any);
+    const spy = vi
+      .spyOn(api, "get")
+      .mockResolvedValueOnce({ data: { id: "u1", email: "test@example.com" } } as unknown as Promise<{ data: { id: string; email: string } }>);
     const { result } = renderHook(() => useMe(), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toMatchObject({ email: "test@example.com" });

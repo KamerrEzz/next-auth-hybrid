@@ -12,11 +12,11 @@ function wrapper(ui: React.ReactNode) {
 describe("NotesPanel", () => {
   it("crea una nota desde el formulario", async () => {
     vi.spyOn(api, "get").mockImplementation(async (url: string) => {
-      if (url.startsWith("/notes")) return { data: [] } as any;
-      if (url === "/auth/csrf") return { data: {} } as any;
-      return { data: {} } as any;
+      if (url.startsWith("/notes")) return { data: [] } as unknown as Promise<{ data: unknown[] }>;
+      if (url === "/auth/csrf") return { data: {} } as unknown as Promise<{ data: object }>;
+      return { data: {} } as unknown as Promise<{ data: object }>;
     });
-    const postSpy = vi.spyOn(api, "post").mockResolvedValue({} as any);
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({} as unknown as Promise<unknown>);
 
     render(wrapper(<NotesPanel />));
     await waitFor(() => expect(screen.getByText(/Notas/)).toBeInTheDocument());

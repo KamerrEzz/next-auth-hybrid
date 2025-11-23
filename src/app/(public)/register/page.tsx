@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 import { api } from "@/lib/api";
 
 const RegisterSchema = z.object({
@@ -33,8 +34,15 @@ export default function RegisterPage() {
       await api.post("/auth/register", values);
       toast.success("Cuenta creada");
       router.push("/dashboard");
-    } catch {
-      toast.error("Error al registrar");
+    } catch (err) {
+      const e = err as AxiosError<{ message?: string; statusCode?: number }>;
+      const status = e.response?.status;
+      if (status === 409) toast.error(e.response?.data?.message ?? "Email ya registrado");
+      else if (status === 401) toast.error("Credenciales inválidas o no permitido");
+      else if (status === 403) {
+        toast.error("CSRF inválido: refresca e inténtalo de nuevo");
+        api.get("/auth/csrf");
+      } else toast.error(e.response?.data?.message ?? "Error al registrar");
     }
   };
 
