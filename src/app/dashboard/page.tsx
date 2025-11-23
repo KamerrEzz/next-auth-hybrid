@@ -41,6 +41,9 @@ export default async function DashboardPage() {
       <section className="border rounded p-4">
         <SessionsPanel />
       </section>
+      <section className="border rounded p-4">
+        <NotesPanel />
+      </section>
     </div>
   );
 }
@@ -49,3 +52,4 @@ import ChangePassword from "@/components/change-password";
 import LogoutButton from "@/components/logout-button";
 import TwofaPanel from "@/components/twofa-panel";
 import SessionsPanel from "@/components/sessions-panel";
+import NotesPanel from "@/components/notes-panel";

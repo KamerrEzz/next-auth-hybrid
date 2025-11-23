@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         source: "/auth/:path*",
         destination: `${backend}/auth/:path*`,
       },
+      {
+        source: "/notes/:path*",
+        destination: `${backend}/notes/:path*`,
+      },
     ];
   },
 };
