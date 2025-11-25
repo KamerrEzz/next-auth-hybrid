@@ -11,12 +11,21 @@ import NotesPanel from "@/features/notes/components/notes-panel";
 async function getMe() {
   const store = await cookies();
   const cookieHeader = store.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
-  const res = await fetch(`${backend}/auth/me`, {
-    headers: { Cookie: cookieHeader },
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  return res.json();
+  console.log("Dashboard: Fetching me with cookies:", cookieHeader);
+  try {
+    const res = await fetch(`${backend}/auth/me`, {
+      headers: { Cookie: cookieHeader },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error("Dashboard: Fetch failed", res.status, await res.text());
+      return null;
+    }
+    return res.json();
+  } catch (e) {
+    console.error("Dashboard: Fetch error", e);
+    return null;
+  }
 }
 
 export default async function DashboardPage() {
