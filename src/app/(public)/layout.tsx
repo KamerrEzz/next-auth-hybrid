@@ -1,9 +1,4 @@
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-    title: 'Autenticación',
-    description: 'Inicia sesión o regístrate',
-};
+import Navbar from "@/components/navbar";
 
 export default function PublicLayout({
     children,
@@ -11,10 +6,9 @@ export default function PublicLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-            <div className="w-full max-w-md px-4">
-                {children}
-            </div>
-        </div>
+        <>
+            <Navbar />
+            <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
+        </>
     );
 }

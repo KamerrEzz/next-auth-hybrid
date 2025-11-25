@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 const backend = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
 import ChangePassword from "@/features/auth/components/change-password";
-import LogoutButton from "@/features/auth/components/logout-button";
 import TwofaPanel from "@/features/auth/components/twofa-panel";
 import SessionsPanel from "@/features/auth/components/sessions-panel";
 import NotesPanel from "@/features/notes/components/notes-panel";
@@ -33,12 +32,7 @@ export default async function DashboardPage() {
   if (!me) redirect("/login");
 
   return (
-    <div className="max-w-2xl mx-auto p-6 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <LogoutButton />
-      </div>
-
+    <div className="max-w-4xl mx-auto flex flex-col gap-6">
       <section className="border rounded p-4">
         <div className="font-medium mb-2">Perfil</div>
         <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(me, null, 2)}</pre>
