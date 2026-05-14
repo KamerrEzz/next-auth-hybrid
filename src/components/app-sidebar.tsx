@@ -2,11 +2,10 @@
 
 import * as React from "react"
 import {
-    Command,
+    ShieldCheck,
     Settings2,
     LogOut,
-    User,
-    LayoutDashboard
+    LayoutDashboard,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
@@ -43,12 +42,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <a href="/dashboard">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Command className="size-4" />
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                                    <ShieldCheck className="size-4" />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">Acme Inc</span>
-                                    <span className="truncate text-xs">Enterprise</span>
+                                    <span className="truncate font-semibold">VaultAuth</span>
+                                    <span className="truncate text-xs text-muted-foreground">Seguridad avanzada</span>
                                 </div>
                             </a>
                         </SidebarMenuButton>
@@ -66,14 +65,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild tooltip="Perfil">
-                            <a href="/dashboard/profile">
-                                <User />
-                                <span>Perfil</span>
-                            </a>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
                         <SidebarMenuButton asChild tooltip="Configuración">
                             <a href="/dashboard/settings">
                                 <Settings2 />
@@ -86,7 +77,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton onClick={handleLogout} tooltip="Cerrar Sesión">
+                        <SidebarMenuButton
+                            onClick={handleLogout}
+                            tooltip="Cerrar Sesión"
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        >
                             <LogOut />
                             <span>Cerrar Sesión</span>
                         </SidebarMenuButton>

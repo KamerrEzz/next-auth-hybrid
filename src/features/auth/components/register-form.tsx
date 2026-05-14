@@ -18,7 +18,7 @@ export function RegisterForm() {
     const [email, setEmail] = useState('');
 
     return (
-        <Card className="w-full shadow-2xl border-0">
+        <Card className="w-full shadow-2xl border-border/60">
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold tracking-tight">
                     Crear Cuenta
