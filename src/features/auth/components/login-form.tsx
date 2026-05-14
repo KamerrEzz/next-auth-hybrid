@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2, Mail, Lock, Shield } from 'lucide-react';
 import Link from 'next/link';
 
-export function LoginForm() {
+export function LoginForm({ from }: { from?: string }) {
     const [loginState, loginFormAction, isLoginPending] = useActionState(loginAction, null);
     const [otpState, otpFormAction, isOtpPending] = useActionState(verifyOtpAction, null);
 
@@ -33,6 +33,7 @@ export function LoginForm() {
             <CardContent>
                 {!requiresOtp ? (
                     <form action={loginFormAction} className="space-y-4">
+                        {from && <input type="hidden" name="from" value={from} />}
                         <div className="space-y-2">
                             <Label htmlFor="email" className="flex items-center gap-2">
                                 <Mail className="h-4 w-4" />
@@ -100,6 +101,7 @@ export function LoginForm() {
                 ) : (
                     <form action={otpFormAction} className="space-y-4">
                         <input type="hidden" name="tempToken" value={loginState.tempToken} />
+                        {from && <input type="hidden" name="from" value={from} />}
 
                         <div className="space-y-2">
                             <Label htmlFor="totpCode" className="flex items-center gap-2">

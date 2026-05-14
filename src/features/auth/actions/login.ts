@@ -64,7 +64,13 @@ async function setAuthCookies(response: Response) {
     }
 }
 
+function safeRedirectUrl(from: unknown): string {
+    if (typeof from !== 'string' || !from.startsWith('/')) return '/dashboard';
+    return from;
+}
+
 export async function loginAction(prevState: unknown, formData: FormData) {
+    const from = safeRedirectUrl(formData.get('from'));
     const parsed = loginSchema.safeParse({
         email: formData.get('email'),
         password: formData.get('password'),
@@ -122,7 +128,7 @@ export async function loginAction(prevState: unknown, formData: FormData) {
         return { error: 'Error de conexión con el servidor' };
     }
 
-    redirect('/dashboard');
+    redirect(from);
 }
 
 const verifyOtpSchema = z.object({
@@ -131,6 +137,7 @@ const verifyOtpSchema = z.object({
 });
 
 export async function verifyOtpAction(prevState: unknown, formData: FormData) {
+    const from = safeRedirectUrl(formData.get('from'));
     const parsed = verifyOtpSchema.safeParse({
         tempToken: formData.get('tempToken'),
         totpCode: formData.get('totpCode'),
@@ -165,5 +172,5 @@ export async function verifyOtpAction(prevState: unknown, formData: FormData) {
         return { error: 'Error de conexión con el servidor' };
     }
 
-    redirect('/dashboard');
+    redirect(from);
 }

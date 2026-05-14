@@ -37,8 +37,15 @@
 - **OAuth** — login con un clic mediante Google y Discord a través del proxy del backend
 - **Gestión de sesiones** — listar sesiones activas, revocar dispositivos de forma individual o en bloque
 
+### Portal del desarrollador y consentimiento OAuth
+
+- **Portal del desarrollador** (`/developer`) — registro de aplicaciones OAuth, visualización de `clientId`, gestión de `redirectUris` y scopes, regeneración de `client_secret`. El secreto se muestra una sola vez con opción de mostrar/ocultar y copiar.
+- **Página de consentimiento** (`/oauth/consent`) — muestra el nombre de la app y los scopes solicitados en lenguaje natural; el usuario aprueba o deniega la delegación. La URL incluye `request_id` generado por el backend; si expira o es inválido se muestra un estado de error.
+- **Redirección post-login inteligente** — si el usuario llega a `/login` desde una URL de consentimiento OAuth, el parámetro `?from=` preserva la URL destino y el login lo recupera automáticamente.
+- **`useMe` con redirección opt-in** — el hook no redirige a `/login` por defecto al recibir un 401; solo el layout protegido activa la redirección mediante `useMe({ redirectOnUnauthenticated: true })`. Esto evita conflictos durante la carga de páginas públicas (como la de consentimiento).
+
 ### Seguridad
-- **Middleware de rutas** — `src/middleware.ts` protege cada ruta `/dashboard/*` antes del render; las peticiones no autenticadas redirigen a `/login?from=<ruta>`
+- **Middleware de rutas** — `src/middleware.ts` protege `/dashboard/*` y `/developer/*` antes del render; las peticiones no autenticadas redirigen a `/login?from=<ruta>`
 - **Cabeceras de seguridad HTTP** — `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` (HSTS con preload) y una `Content-Security-Policy` completa — todas aplicadas en `next.config.ts`
 - **URL del backend nunca pública** — la variable de entorno `BACKEND_URL` (sin prefijo `NEXT_PUBLIC_`) solo se lee en el servidor; el cliente nunca ve la dirección interna del backend
 - **Reenvío de cookies** — las cabeceras `Set-Cookie` del backend se reenvían al navegador mediante un parser tipado que gestiona correctamente el padding `=` en valores JWT en base64
@@ -76,6 +83,9 @@ src/
 ├── app/
 │   ├── (app)/              # Rutas protegidas (gestionadas por middleware)
 │   │   ├── dashboard/      # Página principal autenticada
+│   │   ├── developer/      # Portal del desarrollador OAuth
+│   │   ├── oauth/
+│   │   │   └── consent/    # Pantalla de consentimiento OAuth
 │   │   ├── loading.tsx     # Indicador de carga
 │   │   └── error.tsx       # Boundary de errores
 │   ├── (public)/           # Rutas no autenticadas
@@ -86,15 +96,16 @@ src/
 ├── features/
 │   ├── auth/
 │   │   ├── actions/        # Server Actions: login, register, verifyOtp
-│   │   └── components/     # LoginForm, RegisterForm, LogoutButton, etc.
+│   │   ├── components/     # LoginForm, RegisterForm, LogoutButton, etc.
+│   │   └── hooks/          # useMe (con redirectOnUnauthenticated opt-in)
 │   └── notes/
 │       ├── components/     # NotesPanel
 │       └── hooks/          # useNotes (TOTP vía cabecera X-TOTP-Code)
-├── components/             # UI compartida (Navbar, Sidebar, componentes shadcn)
+├── components/             # UI compartida (Navbar, AppSidebar, componentes shadcn)
 ├── lib/
 │   ├── api.ts              # Instancia axios con interceptor CSRF
 │   └── env.ts              # Validación de entorno en tiempo de ejecución (Zod)
-└── middleware.ts            # Protección de rutas
+└── middleware.ts            # Protección de /dashboard/* y /developer/*
 ```
 
 ---
@@ -188,6 +199,43 @@ Cada respuesta incluye las siguientes cabeceras (configuradas en `next.config.ts
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` |
 | `Content-Security-Policy` | `default-src 'self'; script-src 'self' 'unsafe-inline'; ...` |
+
+---
+
+## Deshabilitar el portal del desarrollador y el consentimiento OAuth
+
+Si tu despliegue no necesita exponer VaultAuth como proveedor OAuth para aplicaciones de terceros, puedes eliminar estas rutas sin afectar el resto del sistema de autenticación.
+
+### 1. Eliminar las rutas del portal y el consentimiento
+
+```bash
+rm -rf src/app/(app)/developer/
+rm -rf src/app/(app)/oauth/
+```
+
+### 2. Quitar la entrada del sidebar
+
+En `src/components/app-sidebar.tsx`, elimina el bloque `SidebarMenuItem` con `href="/developer"` y el import `Code` de lucide-react.
+
+### 3. Reducir el matcher del middleware
+
+En `src/middleware.ts`, elimina `/developer` de la lista de prefijos protegidos y el patrón `/developer/:path*` del `matcher`:
+
+```ts
+// Antes
+const PROTECTED_PREFIXES = ['/dashboard', '/developer'];
+export const config = {
+  matcher: ['/dashboard/:path*', '/developer/:path*'],
+};
+
+// Después
+const PROTECTED_PREFIXES = ['/dashboard'];
+export const config = {
+  matcher: ['/dashboard/:path*'],
+};
+```
+
+El backend también debe tener el `OAuthModule` deshabilitado (ver [nest-auth-hybrid — Deshabilitar OAuth](https://github.com/KamerrEzz/nest-auth-hybrid#deshabilitar-el-módulo-oauth)).
 
 ---
 

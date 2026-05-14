@@ -4,6 +4,40 @@ Todas las novedades relevantes de este proyecto se documentan aquí. El
 formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
 
+## [0.3.1] - 2026-05-14
+
+### Sprint 7 — Correcciones del flujo OAuth
+
+#### Added
+
+- **Preservación del parámetro `from` a través del flujo OAuth**: cuando el
+  usuario no tiene sesión activa y es redirigido a `/login` desde la página
+  de consentimiento, la URL de consentimiento se guarda en el parámetro `from`.
+  Las Server Actions `loginAction` y `verifyOtpAction` redirigen a `from` (con
+  validación de prefijo `/oauth`) en lugar de a `/dashboard` si el parámetro
+  está presente. `LoginForm` reenvía `from` mediante un `<input type="hidden">`.
+
+#### Changed
+
+- **`useMe` — redirección como opción explícita**: el hook aceptaba un booleano
+  implícito; ahora recibe `{ redirectOnUnauthenticated?: boolean }` (defecto
+  `false`). Esto evita que componentes en el layout público (como `Navbar`)
+  redirijan a `/login` en respuestas 401 válidas durante la carga inicial de
+  la página de consentimiento.
+- **`AppSidebar` usa `useMe({ redirectOnUnauthenticated: true })`**: el sidebar
+  (exclusivo del layout protegido `(app)`) es el único punto que activa la
+  redirección automática; el `Navbar` del layout público ya no la activa.
+
+#### Fixed
+
+- **Flash del dashboard → vuelta a login en el primer intento OAuth**: tras
+  completar el login, el hook `useMe` del `Navbar` (visible en la página de
+  consentimiento) a veces recibía un 401 transitorio antes de que la cookie de
+  sesión se propagara completamente, disparando la redirección a `/login`. Al
+  hacer la redirección opt-in, el flujo completo funciona en el primer intento.
+
+---
+
 ## [0.3.0] - 2026-05-14
 
 ### Sprint 6 — VaultAuth como proveedor OAuth 2.0

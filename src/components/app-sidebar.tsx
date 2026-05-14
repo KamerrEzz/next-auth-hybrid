@@ -27,7 +27,7 @@ import { useMe } from "@/features/auth/hooks/useMe"
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter()
     const queryClient = useQueryClient()
-    useMe()
+    useMe({ redirectOnUnauthenticated: true })
 
     const handleLogout = async () => {
         await api.post("/auth/logout")

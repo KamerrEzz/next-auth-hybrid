@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { api } from "@/lib/api";
 import axios from "axios";
 
-export function useMe() {
+export function useMe({ redirectOnUnauthenticated = false } = {}) {
   const router = useRouter();
 
   const query = useQuery({
@@ -23,10 +23,10 @@ export function useMe() {
   });
 
   useEffect(() => {
-    if (query.isSuccess && query.data === null) {
+    if (redirectOnUnauthenticated && query.isSuccess && query.data === null) {
       router.push("/login");
     }
-  }, [query.isSuccess, query.data, router]);
+  }, [redirectOnUnauthenticated, query.isSuccess, query.data, router]);
 
   return query;
 }
