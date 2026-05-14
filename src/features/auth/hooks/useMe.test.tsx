@@ -4,8 +4,10 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { api } from "@/lib/api";
 import { useMe } from "./useMe";
 
+const mockPush = vi.fn();
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: mockPush }),
 }));
 
 function wrapper({ children }: { children: React.ReactNode }) {
@@ -35,12 +37,10 @@ describe("useMe", () => {
     const { result } = renderHook(() => useMe(), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toBeNull();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it("redirige a /login cuando redirectOnUnauthenticated=true y devuelve 401", async () => {
-    const pushMock = vi.fn();
-    vi.mocked(await import("next/navigation")).useRouter = () => ({ push: pushMock } as ReturnType<typeof import("next/navigation").useRouter>);
-
     vi.spyOn(api, "get").mockRejectedValueOnce(
       Object.assign(new Error("401"), { isAxiosError: true, response: { status: 401 } })
     );
@@ -48,6 +48,6 @@ describe("useMe", () => {
     const { result } = renderHook(() => useMe({ redirectOnUnauthenticated: true }), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toBeNull();
-    expect(pushMock).toHaveBeenCalledWith("/login");
+    expect(mockPush).toHaveBeenCalledWith("/login");
   });
 });
