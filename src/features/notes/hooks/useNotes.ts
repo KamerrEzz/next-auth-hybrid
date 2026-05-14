@@ -9,7 +9,12 @@ export function useNotes(totpCode?: string) {
   const key = ["notes", totpCode ?? ""] as const;
   const query = useQuery<Note[]>({
     queryKey: key,
-    queryFn: async () => (await api.get<Note[]>(`/notes${totpCode ? `?totpCode=${encodeURIComponent(totpCode)}` : ""}`)).data,
+    queryFn: async () =>
+      (
+        await api.get<Note[]>("/notes", {
+          headers: totpCode ? { "X-TOTP-Code": totpCode } : undefined,
+        })
+      ).data,
   });
 
   const refresh = async () => {
