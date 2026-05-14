@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { loginAction, verifyOtpAction } from '@/features/auth/actions/login';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,16 @@ export function LoginForm({ from }: { from?: string }) {
 
     const requiresOtp = loginState?.requiresOtp;
     const isPending = isLoginPending || isOtpPending;
+
+    // OAuth redirects need a full browser navigation so the session cookie set
+    // by the server action is sent in the subsequent request to /oauth/authorize.
+    // redirect() from a server action causes a soft-nav that server-follows the
+    // backend's 302, leaving the browser URL at /oauth/authorize without the
+    // request_id that useSearchParams() needs on the consent page.
+    useEffect(() => {
+        const redirectTo = loginState?.redirectTo ?? otpState?.redirectTo;
+        if (redirectTo) window.location.href = redirectTo;
+    }, [loginState?.redirectTo, otpState?.redirectTo]);
 
     return (
         <Card className="w-full shadow-2xl border-border/60">

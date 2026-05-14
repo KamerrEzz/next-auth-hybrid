@@ -124,6 +124,15 @@ export async function loginAction(prevState: unknown, formData: FormData) {
         }
 
         await setAuthCookies(response);
+
+        // OAuth redirect: return the URL instead of calling redirect() so the
+        // LoginForm can do window.location.href for a full browser navigation.
+        // Next.js soft-nav (triggered by redirect()) server-follows the backend's
+        // 302 to /oauth/consent without updating the browser URL, causing
+        // useSearchParams() to read from /oauth/authorize and return null.
+        if (from.startsWith('/oauth/')) {
+            return { redirectTo: from };
+        }
     } catch {
         return { error: 'Error de conexión con el servidor' };
     }
@@ -168,6 +177,10 @@ export async function verifyOtpAction(prevState: unknown, formData: FormData) {
         }
 
         await setAuthCookies(response);
+
+        if (from.startsWith('/oauth/')) {
+            return { redirectTo: from };
+        }
     } catch {
         return { error: 'Error de conexión con el servidor' };
     }
