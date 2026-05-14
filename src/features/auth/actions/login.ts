@@ -64,7 +64,7 @@ async function setAuthCookies(response: Response) {
     }
 }
 
-export async function loginAction(prevState: any, formData: FormData) {
+export async function loginAction(prevState: unknown, formData: FormData) {
     const parsed = loginSchema.safeParse({
         email: formData.get('email'),
         password: formData.get('password'),
@@ -130,7 +130,7 @@ const verifyOtpSchema = z.object({
     totpCode: z.string().length(6, 'El código debe tener 6 dígitos'),
 });
 
-export async function verifyOtpAction(prevState: any, formData: FormData) {
+export async function verifyOtpAction(prevState: unknown, formData: FormData) {
     const parsed = verifyOtpSchema.safeParse({
         tempToken: formData.get('tempToken'),
         totpCode: formData.get('totpCode'),

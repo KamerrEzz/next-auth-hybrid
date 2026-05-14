@@ -234,7 +234,7 @@ export default function NotesPanel() {
           </div>
           <div className="text-sm font-medium">Sin notas</div>
           <div className="text-xs text-muted-foreground">
-            Crea tu primera nota con el botón "Nueva nota"
+            Crea tu primera nota con el botón &quot;Nueva nota&quot;
           </div>
         </div>
       )}

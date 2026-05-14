@@ -71,7 +71,7 @@ async function setAuthCookies(response: Response) {
     }
 }
 
-export async function registerAction(prevState: any, formData: FormData) {
+export async function registerAction(prevState: unknown, formData: FormData) {
     const parsed = registerSchema.safeParse({
         email: formData.get('email'),
         password: formData.get('password'),

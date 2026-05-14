@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Shield, ShieldCheck, ShieldAlert, ShieldOff,
+  ShieldCheck, ShieldAlert, ShieldOff,
   Download, Copy, RefreshCw, X, KeyRound, Fingerprint, ArrowRight,
 } from "lucide-react";
 
