@@ -9,37 +9,58 @@ const loginSchema = z.object({
     password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 });
 
-// Helper to set cookies from backend response
+type ParsedCookie = {
+    name: string;
+    value: string;
+    path: string;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: 'lax' | 'strict' | 'none';
+    maxAge?: number;
+    expires?: Date;
+};
+
+function splitOnce(input: string, sep: string): [string, string] {
+    const idx = input.indexOf(sep);
+    if (idx < 0) return [input, ''];
+    return [input.slice(0, idx), input.slice(idx + 1)];
+}
+
+function parseSetCookie(raw: string): ParsedCookie | null {
+    const [pair, ...attrs] = raw.split(';');
+    const [rawName, rawValue] = splitOnce(pair, '=');
+    const name = rawName.trim();
+    if (!name) return null;
+    const value = rawValue.trim();
+
+    const parsed: ParsedCookie = { name, value, path: '/' };
+    for (const attr of attrs) {
+        const [k, v] = splitOnce(attr.trim(), '=');
+        const key = k.toLowerCase();
+        const val = v.trim();
+        if (key === 'path') parsed.path = val || '/';
+        else if (key === 'httponly') parsed.httpOnly = true;
+        else if (key === 'secure') parsed.secure = true;
+        else if (key === 'samesite') {
+            const s = val.toLowerCase();
+            if (s === 'lax' || s === 'strict' || s === 'none') parsed.sameSite = s;
+        } else if (key === 'max-age') {
+            const n = Number.parseInt(val, 10);
+            if (Number.isFinite(n)) parsed.maxAge = n;
+        } else if (key === 'expires') {
+            const d = new Date(val);
+            if (!Number.isNaN(d.getTime())) parsed.expires = d;
+        }
+    }
+    return parsed;
+}
+
 async function setAuthCookies(response: Response) {
     const cookieStore = await cookies();
     const setCookieHeader = response.headers.getSetCookie();
-
-    if (setCookieHeader) {
-        setCookieHeader.forEach((cookieString) => {
-            const [cookieNameValue, ...options] = cookieString.split(';');
-            const [name, value] = cookieNameValue.split('=');
-
-            if (name && value) {
-                const cookieOptions: any = {
-                    path: '/', // Default to root path
-                };
-                options.forEach((option) => {
-                    const [key, val] = option.trim().split('=');
-                    if (key.toLowerCase() === 'path') cookieOptions.path = val || '/';
-                    if (key.toLowerCase() === 'httponly') cookieOptions.httpOnly = true;
-                    if (key.toLowerCase() === 'secure') cookieOptions.secure = true;
-                    if (key.toLowerCase() === 'samesite') cookieOptions.sameSite = val.toLowerCase() as 'lax' | 'strict' | 'none';
-                    if (key.toLowerCase() === 'max-age') cookieOptions.maxAge = parseInt(val);
-                    if (key.toLowerCase() === 'expires') cookieOptions.expires = new Date(val);
-                });
-
-                cookieStore.set({
-                    name,
-                    value,
-                    ...cookieOptions,
-                });
-            }
-        });
+    for (const cookieString of setCookieHeader) {
+        const parsed = parseSetCookie(cookieString);
+        if (parsed) cookieStore.set(parsed);
     }
 }
 
