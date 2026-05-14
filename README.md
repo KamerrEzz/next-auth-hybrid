@@ -1,7 +1,7 @@
 <h1 align="center">next-auth-hybrid</h1>
 
 <p align="center">
-  Full-featured authentication frontend built with Next.js 16 App Router — server actions, 2FA, OAuth and production-ready security headers.
+  Frontend de autenticación completo construido con Next.js 16 App Router — server actions, 2FA, OAuth y cabeceras de seguridad listas para producción.
 </p>
 
 <p align="center">
@@ -13,66 +13,72 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/OWASP_Top_10-audited-4CAF50?style=flat-square" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" />
+  <img src="https://img.shields.io/badge/OWASP_Top_10-auditado-4CAF50?style=flat-square" />
+  <img src="https://img.shields.io/badge/Licencia-MIT-yellow?style=flat-square" />
+</p>
+
+<p align="center">
+  <a href="./README.en.md">🇬🇧 English version</a>
 </p>
 
 ---
 
-## Overview
+## Descripción general
 
-`next-auth-hybrid` is the frontend counterpart to [`nest-auth-hybrid`](https://github.com/KamerrEzz/nest-auth-hybrid). It provides a polished authentication UI built on the **Next.js App Router** with React Server Components, Server Actions and route middleware — no client-side token storage, no security shortcuts.
-
----
-
-## Features
-
-### Authentication
-- **Register / Login** — validated Server Actions with typed error states and server-side redirect on success
-- **Two-Factor Authentication** — TOTP code entry flow (Google Authenticator compatible), backup code usage
-- **OAuth** — Google and Discord one-click login via the backend proxy
-- **Session management** — list active sessions, revoke individual or all-other devices
-
-### Security
-- **Route middleware** — `src/middleware.ts` protects every `/dashboard/*` route before render; unauthenticated requests redirect to `/login?from=<path>`
-- **HTTP security headers** — `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` (HSTS with preload) and a full `Content-Security-Policy` — all applied in `next.config.ts`
-- **Backend URL never public** — `BACKEND_URL` env var (no `NEXT_PUBLIC_` prefix) is only read server-side; the client never sees the internal backend address
-- **Cookie forwarding** — `Set-Cookie` headers from the backend are forwarded to the browser through a typed parser that handles base64 `=` padding in JWT values correctly
-- **Generic error messages** — login always returns "Credenciales inválidas" regardless of whether the email exists, preventing user enumeration
-- **CSRF priming** — CSRF token loaded at page render and attached to every mutating request via the axios interceptor
-
-### Developer experience
-- **React Query** with sensible defaults (1 min stale, 5 min gc, no window-focus refetch)
-- **React Query Devtools** loaded only in development (conditional `require()`) — zero production bundle impact
-- **React Hook Form** + Zod validation on all forms
-- **shadcn/ui** component library with Tailwind CSS v4
+`next-auth-hybrid` es el frontend complementario de [`nest-auth-hybrid`](https://github.com/KamerrEzz/nest-auth-hybrid). Proporciona una interfaz de autenticación construida sobre el **Next.js App Router** con React Server Components, Server Actions y middleware de rutas — sin almacenamiento de tokens en el cliente, sin atajos de seguridad.
 
 ---
 
-## Stack
+## Funcionalidades
 
-| Layer | Technology |
+### Autenticación
+- **Registro / Login** — Server Actions validadas con estados de error tipados y redirección en el servidor al completar correctamente
+- **Autenticación de dos factores** — flujo de entrada de código TOTP (compatible con Google Authenticator), uso de códigos de respaldo
+- **OAuth** — login con un clic mediante Google y Discord a través del proxy del backend
+- **Gestión de sesiones** — listar sesiones activas, revocar dispositivos de forma individual o en bloque
+
+### Seguridad
+- **Middleware de rutas** — `src/middleware.ts` protege cada ruta `/dashboard/*` antes del render; las peticiones no autenticadas redirigen a `/login?from=<ruta>`
+- **Cabeceras de seguridad HTTP** — `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` (HSTS con preload) y una `Content-Security-Policy` completa — todas aplicadas en `next.config.ts`
+- **URL del backend nunca pública** — la variable de entorno `BACKEND_URL` (sin prefijo `NEXT_PUBLIC_`) solo se lee en el servidor; el cliente nunca ve la dirección interna del backend
+- **Reenvío de cookies** — las cabeceras `Set-Cookie` del backend se reenvían al navegador mediante un parser tipado que gestiona correctamente el padding `=` en valores JWT en base64
+- **Mensajes de error genéricos** — el login siempre devuelve "Credenciales inválidas" independientemente de si el email existe, previniendo la enumeración de usuarios
+- **Preparación CSRF** — el token CSRF se carga al renderizar la página y se adjunta a cada petición mutante mediante el interceptor de axios
+
+### Experiencia de desarrollo
+- **React Query** con valores por defecto sensatos (1 min stale, 5 min gc, sin refetch al recuperar el foco)
+- **React Query Devtools** cargado solo en desarrollo (mediante `require()` condicional) — sin impacto en el bundle de producción
+- **React Hook Form** + validación Zod en todos los formularios
+- **shadcn/ui** con Tailwind CSS v4
+
+---
+
+## Stack tecnológico
+
+| Capa | Tecnología |
 |---|---|
 | Framework | Next.js 16 (App Router) |
-| Language | TypeScript 5 |
+| Lenguaje | TypeScript 5 |
 | UI | React 19, shadcn/ui, Tailwind CSS 4 |
-| Server state | @tanstack/react-query 5 |
-| Forms | react-hook-form + Zod |
-| HTTP client | axios (client) + native fetch (server) |
-| Notifications | Sonner |
-| Icons | Lucide React |
+| Estado del servidor | @tanstack/react-query 5 |
+| Formularios | react-hook-form + Zod |
+| Cliente HTTP | axios (cliente) + fetch nativo (servidor) |
+| Notificaciones | Sonner |
+| Iconos | Lucide React |
 | Tests | Vitest + Testing Library |
 
 ---
 
-## Project Structure
+## Estructura del proyecto
 
 ```
 src/
 ├── app/
-│   ├── (app)/              # Protected routes (middleware-gated)
-│   │   └── dashboard/      # Main authenticated page
-│   ├── (public)/           # Unauthenticated routes
+│   ├── (app)/              # Rutas protegidas (gestionadas por middleware)
+│   │   ├── dashboard/      # Página principal autenticada
+│   │   ├── loading.tsx     # Indicador de carga
+│   │   └── error.tsx       # Boundary de errores
+│   ├── (public)/           # Rutas no autenticadas
 │   │   ├── login/
 │   │   └── register/
 │   ├── layout.tsx
@@ -83,23 +89,23 @@ src/
 │   │   └── components/     # LoginForm, RegisterForm, LogoutButton, etc.
 │   └── notes/
 │       ├── components/     # NotesPanel
-│       └── hooks/          # useNotes (TOTP via X-TOTP-Code header)
-├── components/             # Shared UI (Navbar, Sidebar, shadcn components)
+│       └── hooks/          # useNotes (TOTP vía cabecera X-TOTP-Code)
+├── components/             # UI compartida (Navbar, Sidebar, componentes shadcn)
 ├── lib/
-│   ├── api.ts              # Axios instance with CSRF interceptor
-│   └── env.ts              # Runtime env validation (Zod)
-└── middleware.ts            # Route protection
+│   ├── api.ts              # Instancia axios con interceptor CSRF
+│   └── env.ts              # Validación de entorno en tiempo de ejecución (Zod)
+└── middleware.ts            # Protección de rutas
 ```
 
 ---
 
-## Quick Start
+## Inicio rápido
 
-### Prerequisites
+### Requisitos previos
 - Node.js >= 20
-- A running instance of [nest-auth-hybrid](https://github.com/KamerrEzz/nest-auth-hybrid)
+- Una instancia en ejecución de [nest-auth-hybrid](https://github.com/KamerrEzz/nest-auth-hybrid)
 
-### 1. Clone and install
+### 1. Clonar e instalar
 
 ```bash
 git clone https://github.com/KamerrEzz/next-auth-hybrid.git
@@ -107,51 +113,51 @@ cd next-auth-hybrid
 npm install
 ```
 
-### 2. Configure environment
+### 2. Configurar el entorno
 
 ```bash
 cp .env.example .env.local
 ```
 
 ```env
-# Internal backend URL — server-only, never exposed to the browser
+# URL interna del backend — solo en servidor, nunca expuesta al navegador
 BACKEND_URL=http://localhost:3000
 
 NODE_ENV=development
 ```
 
-### 3. Run
+### 3. Ejecutar
 
 ```bash
-npm run dev       # Development (http://localhost:3001)
-npm run build     # Production build
-npm run start     # Production server
-npm test          # Vitest unit tests
+npm run dev       # Desarrollo (http://localhost:3001)
+npm run build     # Build de producción
+npm run start     # Servidor de producción
+npm test          # Tests unitarios con Vitest
 ```
 
 ---
 
-## Authentication Flow
+## Flujo de autenticación
 
 ```
-Browser                  Next.js (server)            NestJS Backend
+Navegador               Next.js (servidor)          Backend NestJS
    |                          |                            |
    |-- POST /login ---------->|                            |
    |  (Server Action)         |-- POST /auth/login ------->|
-   |                          |                            |-- validate credentials
+   |                          |                            |-- valida credenciales
    |                          |<-- 200 + Set-Cookie -------|
    |                          |    (sessionId httpOnly)    |
    |<-- redirect /dashboard --|                            |
    |                          |                            |
    |-- GET /dashboard ------->|                            |
-   |  (middleware checks       |-- GET /auth/me ----------->|
-   |   sessionId cookie)      |<-- 200 { user } -----------|
-   |<-- render dashboard -----|                            |
+   |  (middleware comprueba    |-- GET /auth/me ----------->|
+   |   cookie sessionId)      |<-- 200 { user } -----------|
+   |<-- renderiza dashboard --|                            |
 
-   -- 2FA flow -----------------------------------------------
+   -- Flujo 2FA -----------------------------------------------
    |-- POST /login ---------->|-- POST /auth/login ------->|
    |                          |<-- 200 { requiresOtp,      |
-   |<-- show OTP form --------|         tempToken }         |
+   |<-- muestra form OTP -----|         tempToken }         |
    |-- POST /verify-otp ----->|-- POST /auth/verify-otp -->|
    |  (totpCode + tempToken)  |<-- 200 + Set-Cookie -------|
    |<-- redirect /dashboard --|                            |
@@ -159,22 +165,22 @@ Browser                  Next.js (server)            NestJS Backend
 
 ---
 
-## Environment Variables
+## Variables de entorno
 
-| Variable | Required | Description |
+| Variable | Requerida | Descripción |
 |---|---|---|
-| `BACKEND_URL` | Yes | Internal URL of the NestJS API (server-only) |
-| `NODE_ENV` | Yes | `development` or `production` or `test` |
+| `BACKEND_URL` | Sí | URL interna de la API NestJS (solo servidor) |
+| `NODE_ENV` | Sí | `development`, `production` o `test` |
 
-> `BACKEND_URL` intentionally has **no** `NEXT_PUBLIC_` prefix — it is only consumed server-side (rewrites, Server Actions, RSC) and must never appear in the client bundle.
+> `BACKEND_URL` no tiene prefijo `NEXT_PUBLIC_` intencionalmente — solo se consume en el servidor (rewrites, Server Actions, RSC) y nunca debe aparecer en el bundle del cliente.
 
 ---
 
-## Security Headers
+## Cabeceras de seguridad
 
-Every response includes the following headers (configured in `next.config.ts`):
+Cada respuesta incluye las siguientes cabeceras (configuradas en `next.config.ts`):
 
-| Header | Value |
+| Cabecera | Valor |
 |---|---|
 | `X-Frame-Options` | `DENY` |
 | `X-Content-Type-Options` | `nosniff` |
@@ -185,6 +191,6 @@ Every response includes the following headers (configured in `next.config.ts`):
 
 ---
 
-## License
+## Licencia
 
 MIT © [Kamerr Ezz](https://github.com/KamerrEzz)
