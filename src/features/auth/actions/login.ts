@@ -104,19 +104,12 @@ export async function loginAction(prevState: any, formData: FormData) {
             };
         }
 
-        // Set cookies from backend response
         await setAuthCookies(response);
-
-        // Login exitoso - retornar éxito
-        return {
-            success: true,
-        };
-    } catch (error) {
-        console.error('Login error:', error);
-        return {
-            error: 'Error de conexión con el servidor',
-        };
+    } catch {
+        return { error: 'Error de conexión con el servidor' };
     }
+
+    redirect('/dashboard');
 }
 
 const verifyOtpSchema = z.object({
@@ -154,16 +147,10 @@ export async function verifyOtpAction(prevState: any, formData: FormData) {
             };
         }
 
-        // Set cookies from backend response
         await setAuthCookies(response);
-
-        return {
-            success: true,
-        };
-    } catch (error) {
-        console.error('OTP error:', error);
-        return {
-            error: 'Error de conexión con el servidor',
-        };
+    } catch {
+        return { error: 'Error de conexión con el servidor' };
     }
+
+    redirect('/dashboard');
 }

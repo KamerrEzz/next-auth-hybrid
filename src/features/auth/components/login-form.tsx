@@ -1,7 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState } from 'react';
 import { loginAction, verifyOtpAction } from '@/features/auth/actions/login';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,19 +11,11 @@ import { AlertCircle, Loader2, Mail, Lock, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 export function LoginForm() {
-    const router = useRouter();
     const [loginState, loginFormAction, isLoginPending] = useActionState(loginAction, null);
     const [otpState, otpFormAction, isOtpPending] = useActionState(verifyOtpAction, null);
 
     const requiresOtp = loginState?.requiresOtp;
     const isPending = isLoginPending || isOtpPending;
-
-    // Redirigir cuando el login es exitoso
-    useEffect(() => {
-        if (loginState?.success || otpState?.success) {
-            window.location.href = '/dashboard';
-        }
-    }, [loginState, otpState]);
 
     return (
         <Card className="w-full shadow-2xl border-0">
