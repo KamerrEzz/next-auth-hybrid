@@ -1,0 +1,47 @@
+# Changelog
+
+Todas las novedades relevantes de este proyecto se documentan aquí. El
+formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
+y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
+
+## [Unreleased]
+
+### Sprint 0 — Auditoría de seguridad
+
+#### Fixed
+
+- **Cookies de sesión en los logs**: el dashboard imprimía la cabecera
+  `Cookie` completa (incluyendo los tokens httpOnly) en `console.log` en
+  cada render. Cualquier agregador de logs que recogiera stdout habría
+  capturado credenciales válidas. Se eliminan también los `console.error`
+  que volcaban el cuerpo de la respuesta del backend en caso de fallo.
+- **Parser de `Set-Cookie` roto**: `setAuthCookies` partía cada cookie
+  por `=` con `split('=')`, lo que truncaba valores que contuviesen `=`
+  (típicos en JWT/refresh tokens base64) y dejaba el resto del valor
+  parseado como atributo. Se sustituye por un parser tipado que divide
+  solo en la primera aparición de `=` y valida los atributos
+  (`samesite`, `max-age`, `expires`) antes de aplicarlos. Se elimina
+  además el `any` en las opciones.
+
+#### Added
+
+- **Middleware de autenticación para `/dashboard`**: nuevo
+  `src/middleware.ts` que redirige a `/login` cualquier petición a
+  `/dashboard/:path*` sin cookie de sesión y preserva la ruta original
+  en el parámetro `from`. Hasta ahora la protección dependía solo del
+  RSC de `dashboard/page.tsx`, dejando expuestas las sub-rutas
+  enlazadas desde el sidebar.
+
+#### Changed
+
+- **`NEXT_PUBLIC_API_BASE_URL` → `BACKEND_URL`**: la URL del backend se
+  consumía únicamente desde código server (rewrites, server actions,
+  RSC) pero se exponía al bundle del cliente por el prefijo
+  `NEXT_PUBLIC_`. Se renombra a `BACKEND_URL` (sin prefijo) en
+  `next.config.ts`, `src/lib/env.ts`, ambas server actions, las páginas
+  de `/login` y `/register` y el RSC del dashboard.
+- **`LogoutButton`**: el componente cliente ya no depende de un env var
+  público. Llama a `/auth/logout` a través del rewrite existente de
+  Next.js, manteniendo la URL del backend confinada al servidor.
+
+[Unreleased]: https://github.com/Kamerr/next-auth-hybrid/compare/main...HEAD
