@@ -77,7 +77,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     }
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+        const apiUrl = process.env.BACKEND_URL || 'http://localhost:3000';
 
         const response = await fetch(`${apiUrl}/auth/login`, {
             method: 'POST',
@@ -138,7 +138,7 @@ export async function verifyOtpAction(prevState: any, formData: FormData) {
     }
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+        const apiUrl = process.env.BACKEND_URL || 'http://localhost:3000';
 
         const response = await fetch(`${apiUrl}/auth/verify-otp`, {
             method: 'POST',

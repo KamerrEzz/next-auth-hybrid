@@ -8,14 +8,10 @@ export function LogoutButton() {
 
     const handleLogout = async () => {
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
-
-            await fetch(`${apiUrl}/auth/logout`, {
+            await fetch('/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
             });
-
-            // Redirigir a login
             router.push('/login');
             router.refresh();
         } catch (error) {

@@ -14,7 +14,7 @@ export default async function RegisterPage() {
 
   if (!csrfToken) {
     // Hacer request al backend para obtener CSRF token
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+    const apiUrl = process.env.BACKEND_URL || 'http://localhost:3000';
     await fetch(`${apiUrl}/auth/csrf`, {
       credentials: 'include',
     });

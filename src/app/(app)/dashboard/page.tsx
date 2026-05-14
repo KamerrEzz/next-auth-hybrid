@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-const backend = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
 
 import ChangePassword from "@/features/auth/components/change-password";
 import TwofaPanel from "@/features/auth/components/twofa-panel";

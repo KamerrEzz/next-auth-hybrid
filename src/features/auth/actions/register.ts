@@ -30,7 +30,7 @@ export async function registerAction(prevState: any, formData: FormData) {
     }
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+        const apiUrl = process.env.BACKEND_URL || 'http://localhost:3000';
 
         const response = await fetch(`${apiUrl}/auth/register`, {
             method: 'POST',
