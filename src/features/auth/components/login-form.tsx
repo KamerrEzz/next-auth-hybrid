@@ -62,6 +62,7 @@ export function LoginForm() {
                                 required
                                 disabled={isPending}
                                 className="h-11"
+                                autoComplete="current-password"
                             />
                         </div>
 

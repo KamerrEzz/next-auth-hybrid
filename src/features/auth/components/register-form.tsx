@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState, useEffect } from 'react';
+import { useActionState, useState } from 'react';
 import { registerAction } from '@/features/auth/actions/register';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,6 +78,7 @@ export function RegisterForm() {
                             required
                             disabled={isPending}
                             className="h-11"
+                            autoComplete="new-password"
                         />
                         <p className="text-xs text-muted-foreground">
                             Mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos

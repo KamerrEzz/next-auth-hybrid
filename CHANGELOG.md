@@ -94,4 +94,38 @@ y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
   mediante `require()` condicional en `providers.tsx`, evitando que los
   ~50 KB del panel lleguen al bundle de producción.
 
+### Sprint 3 — Robustez y calidad
+
+#### Added
+
+- **`loading.tsx` y `error.tsx` para el grupo `(app)`**: la ausencia de
+  estos archivos hacía que Next.js no mostrara ningún indicador durante
+  la carga de rutas protegidas ni capturara errores de render. `loading.tsx`
+  muestra un spinner centrado; `error.tsx` es un `'use client'` boundary
+  que presenta el mensaje y ofrece "Reintentar".
+
+#### Fixed
+
+- **Conflicto de tema en `globals.css`**: el bloque `@theme inline` redefinía
+  `--color-primary`, `--color-secondary`, `--color-accent`,
+  `--color-destructive`, `--color-input` y `--color-ring` con valores
+  hexadecimales hardcodeados, anulando las variables oklch del tema shadcn/ui
+  declaradas en `:root`. Se sustituyen los literales por referencias a las
+  variables CSS (`var(--primary)`, etc.) para que el tema responda
+  correctamente al modo oscuro y a las personalizaciones de shadcn.
+- **`lang="en"` en el layout raíz**: cambiado a `lang="es"` para reflejar
+  el idioma real de la aplicación; mejora accesibilidad y lectores de pantalla.
+- **`autoComplete` ausente en campos de contraseña**: los inputs de password
+  en `LoginForm` y `RegisterForm` no declaraban `autoComplete`. Se añade
+  `current-password` en login y `new-password` en registro para habilitar
+  correctamente los gestores de contraseñas.
+- **`useEffect` sin uso en `RegisterForm`**: importado pero nunca referenciado;
+  eliminado para limpiar el bundle.
+
+#### Changed
+
+- **`metadataBase` añadido al layout raíz**: Next.js requiere `metadataBase`
+  para resolver URLs absolutas en Open Graph y Twitter Card. Se lee de
+  `NEXT_PUBLIC_APP_URL` con fallback a `http://localhost:3001`.
+
 [Unreleased]: https://github.com/Kamerr/next-auth-hybrid/compare/main...HEAD
