@@ -9,6 +9,7 @@ import ChangePassword from "@/features/auth/components/change-password";
 import TwofaPanel from "@/features/auth/components/twofa-panel";
 import SessionsPanel from "@/features/auth/components/sessions-panel";
 import NotesPanel from "@/features/notes/components/notes-panel";
+import { VerifyEmailBanner } from "@/features/auth/components/verify-email-banner";
 
 async function getMe() {
   const store = await cookies();
@@ -36,6 +37,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto w-full flex flex-col gap-5">
+
+      {/* Email verification banner */}
+      {me.emailVerified === false && <VerifyEmailBanner />}
 
       {/* Profile */}
       <Card className="border-primary/20 bg-card">
