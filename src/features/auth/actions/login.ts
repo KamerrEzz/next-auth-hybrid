@@ -89,9 +89,8 @@ export async function loginAction(prevState: any, formData: FormData) {
         });
 
         if (!response.ok) {
-            const data = await response.json().catch(() => ({}));
             return {
-                error: data.message || 'Credenciales inválidas',
+                error: 'Credenciales inválidas',
             };
         }
 

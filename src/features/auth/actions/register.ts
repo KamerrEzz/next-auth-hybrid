@@ -42,10 +42,9 @@ export async function registerAction(prevState: any, formData: FormData) {
         });
 
         if (!response.ok) {
-            const data = await response.json().catch(() => ({}));
-            return {
-                error: data.message || 'Error al registrar usuario',
-            };
+            const status = response.status;
+            if (status === 409) return { error: 'Ya existe una cuenta con ese email' };
+            return { error: 'Error al crear la cuenta. Inténtalo de nuevo.' };
         }
 
         // Registro exitoso - redirigir
