@@ -6,6 +6,7 @@ import {
     Settings2,
     LogOut,
     LayoutDashboard,
+    Code,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
@@ -61,6 +62,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <a href="/dashboard">
                                 <LayoutDashboard />
                                 <span>Dashboard</span>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild tooltip="Desarrollador">
+                            <a href="/developer">
+                                <Code />
+                                <span>Desarrollador</span>
                             </a>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
