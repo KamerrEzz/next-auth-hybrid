@@ -1,3 +1,5 @@
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     SidebarInset,
@@ -14,11 +16,31 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
-export default function AppLayout({
+const backendUrl = process.env.BACKEND_URL ?? "http://localhost:3000"
+
+export default async function AppLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    // Server-side auth guard — validates the session against the backend on every
+    // request. This is the real security boundary; proxy.ts is only a coarse
+    // pre-filter that avoids unnecessary round-trips for clearly unauthenticated users.
+    const cookieStore = await cookies()
+    const sessionId = cookieStore.get("sessionId")?.value
+
+    if (!sessionId) redirect("/login")
+
+    try {
+        const res = await fetch(`${backendUrl}/auth/me`, {
+            headers: { Cookie: `sessionId=${sessionId}` },
+            cache: "no-store",
+        })
+        if (!res.ok) redirect("/login")
+    } catch {
+        redirect("/login")
+    }
+
     return (
         <SidebarProvider>
             <AppSidebar />
