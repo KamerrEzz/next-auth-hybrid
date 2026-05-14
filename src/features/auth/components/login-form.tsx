@@ -87,6 +87,15 @@ export function LoginForm() {
                                 'Iniciar Sesión'
                             )}
                         </Button>
+
+                        <div className="text-center">
+                            <Link
+                                href="/forgot-password"
+                                className="text-xs text-muted-foreground underline underline-offset-4 hover:text-primary transition-colors"
+                            >
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        </div>
                     </form>
                 ) : (
                     <form action={otpFormAction} className="space-y-4">

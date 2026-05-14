@@ -89,6 +89,19 @@ export async function loginAction(prevState: any, formData: FormData) {
         });
 
         if (!response.ok) {
+            if (response.status === 429) {
+                return { error: 'Demasiados intentos. Por favor espera unos minutos antes de intentarlo de nuevo.' };
+            }
+            // Check for account lockout message in response body
+            try {
+                const body = await response.json();
+                const msg: string = (body?.message ?? body?.error ?? '').toLowerCase();
+                if (msg.includes('locked')) {
+                    return { error: 'Cuenta temporalmente bloqueada. Intenta de nuevo en 15 minutos.' };
+                }
+            } catch {
+                // ignore parse errors
+            }
             return {
                 error: 'Credenciales inválidas',
             };
