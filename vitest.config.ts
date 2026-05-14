@@ -11,5 +11,6 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     clearMocks: true,
+    exclude: ["**/node_modules/**", "**/e2e/**", "**/*.spec.ts"],
   },
 });

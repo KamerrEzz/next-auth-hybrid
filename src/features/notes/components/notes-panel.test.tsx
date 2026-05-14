@@ -19,10 +19,12 @@ describe("NotesPanel", () => {
     const postSpy = vi.spyOn(api, "post").mockResolvedValue({} as unknown as Promise<unknown>);
 
     render(wrapper(<NotesPanel />));
-    await waitFor(() => expect(screen.getByText(/Notas/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Nueva nota")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Nueva nota"));
 
     fireEvent.change(screen.getByPlaceholderText("Título"), { target: { value: "Mi título" } });
-    fireEvent.change(screen.getByPlaceholderText("Contenido"), { target: { value: "Mi contenido" } });
+    fireEvent.change(screen.getByPlaceholderText("Contenido de la nota..."), { target: { value: "Mi contenido" } });
     fireEvent.click(screen.getByText("Crear"));
 
     await waitFor(() => expect(postSpy).toHaveBeenCalledWith("/notes", { title: "Mi título", content: "Mi contenido", secure: false }));
