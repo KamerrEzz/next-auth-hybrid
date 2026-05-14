@@ -4,6 +4,22 @@ Todas las novedades relevantes de este proyecto se documentan aquí. El
 formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
 
+## [0.3.0] - 2026-05-14
+
+### Sprint 6 — VaultAuth como proveedor OAuth 2.0
+
+#### Added
+
+- **Página de consentimiento OAuth** (`/oauth/consent`): pantalla a la que el backend redirige al usuario tras `/oauth/authorize`. Muestra el nombre de la app cliente, los scopes solicitados (con icono y descripción legible para `openid`, `profile`, `email`, `notes`) y dos acciones (autorizar / denegar) que envían el `request_id` a `POST /oauth/authorize` y siguen el `redirectTo` devuelto por el backend. Si falta `request_id` se muestra un estado de error con vuelta al dashboard.
+- **Portal del desarrollador** (`/developer`): nueva ruta protegida en el grupo `(app)` para registrar aplicaciones OAuth. Permite crear apps con nombre, descripción, `redirectUris` y selección de scopes (`openid` obligatorio); listar las apps existentes con su `clientId`, redirect URIs y scopes; regenerar el `clientSecret`; y eliminar la app con confirmación. El `plainSecret` se muestra una sola vez tras crear/regenerar con un componente que permite mostrar/ocultar y copiar. Incluye una guía de integración con los tres pasos del flow (`/oauth/authorize`, `/oauth/token`, `/oauth/userinfo`) y la URL de discovery OIDC.
+- **Entrada "Desarrollador" en el sidebar** (`src/components/app-sidebar.tsx`): nuevo item con icono `Code` de lucide-react apuntando a `/developer`, situado entre Dashboard y Configuración.
+
+#### Changed
+
+- **`src/middleware.ts`**: la lista de prefijos protegidos pasa de `['/dashboard']` a `['/dashboard', '/developer']` y el `matcher` se amplía con `/developer/:path*`, de modo que las peticiones sin cookie de sesión a la nueva ruta también se redirigen a `/login` preservando `from`.
+
+---
+
 ## [0.2.0] - 2026-05-14
 
 ### Sprint 5 — Flujos de autenticación completos y UX
