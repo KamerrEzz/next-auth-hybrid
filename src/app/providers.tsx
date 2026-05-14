@@ -1,8 +1,14 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactNode, useState } from "react";
 import { Toaster } from "sonner";
+
+const isDev = process.env.NODE_ENV === "development";
+
+// Loaded only in development to avoid shipping devtools to production bundle
+const ReactQueryDevtools = isDev
+  ? require("@tanstack/react-query-devtools").ReactQueryDevtools
+  : null;
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -10,10 +16,10 @@ export default function Providers({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minuto
-            gcTime: 5 * 60 * 1000, // 5 minutos (antes cacheTime)
+            staleTime: 60 * 1000,
+            gcTime: 5 * 60 * 1000,
             refetchOnWindowFocus: false,
-            retry: 1, // Reintentar una vez en caso de error
+            retry: 1,
           },
         },
       }),
@@ -23,7 +29,7 @@ export default function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       {children}
       <Toaster position="top-right" richColors />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {ReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }
