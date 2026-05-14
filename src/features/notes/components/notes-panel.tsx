@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
@@ -36,11 +36,11 @@ export default function NotesPanel() {
 
   const notes = useNotes(totpCode);
 
-  const { register, handleSubmit, formState, reset, watch } = useForm<CreateForm>({
+  const { register, handleSubmit, formState, reset, control } = useForm<CreateForm>({
     resolver: zodResolver(CreateSchema),
     defaultValues: { secure: false },
   });
-  const isSecure = watch("secure");
+  const isSecure = useWatch({ control, name: "secure" });
 
   useEffect(() => {
     api.get("/auth/csrf");
