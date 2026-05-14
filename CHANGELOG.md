@@ -4,6 +4,29 @@ Todas las novedades relevantes de este proyecto se documentan aquí. El
 formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
 y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
 
+## [0.2.0] - 2026-05-14
+
+### Sprint 5 — Flujos de autenticación completos y UX
+
+#### Added
+
+- **Página de recuperación de contraseña** (`/forgot-password`): formulario con server action; siempre muestra éxito para evitar enumeración de emails.
+- **Página de reset de contraseña** (`/reset-password/[token]`): valida el token en cliente antes de enviar; distingue 401 (enlace expirado) de otros errores.
+- **Página de verificación de email** (`/verify-email`): server component que verifica el token en el render inicial con estado visual de éxito/error.
+- **Banner de verificación de email** en el dashboard: aparece cuando `emailVerified === false`, permite reenviar el email de verificación con feedback sonner y confirmación en el lugar.
+- **Página 404 personalizada**: con icono, código monospace y botones de navegación al dashboard y login.
+
+#### Changed
+
+- Formulario de login incluye enlace "¿Olvidaste tu contraseña?" hacia `/forgot-password`.
+
+#### Fixed
+
+- La acción de login ahora detecta respuestas 429 y muestra `'Demasiados intentos. Por favor espera unos minutos.'`.
+- Mensajes de bloqueo de cuenta (`'locked'` en el cuerpo de respuesta) se traducen a `'Cuenta temporalmente bloqueada. Intenta de nuevo en 15 minutos.'`.
+
+---
+
 ## [Unreleased]
 
 ### Sprint 0 — Auditoría de seguridad
