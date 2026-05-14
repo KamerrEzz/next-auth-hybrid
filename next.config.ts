@@ -45,6 +45,14 @@ const nextConfig: NextConfig = {
         source: "/notes/:path*",
         destination: `${backend}/notes/:path*`,
       },
+      {
+        source: "/oauth/:path*",
+        destination: `${backend}/oauth/:path*`,
+      },
+      {
+        source: "/.well-known/:path*",
+        destination: `${backend}/.well-known/:path*`,
+      },
     ];
   },
 };
