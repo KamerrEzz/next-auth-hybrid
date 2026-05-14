@@ -128,4 +128,21 @@ y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
   para resolver URLs absolutas en Open Graph y Twitter Card. Se lee de
   `NEXT_PUBLIC_APP_URL` con fallback a `http://localhost:3001`.
 
+### Sprint 4 — Limpieza final
+
+#### Fixed
+
+- **`TwofaPanel` con referencia muerta a `secret`**: el backend dejó de
+  devolver el campo `secret` en la respuesta de `enable-2fa` en el Sprint 1
+  (el QR ya lo contiene). El panel seguía leyendo `data.secret`, mostrando
+  un input vacío y un botón "Copiar secreto" sin funcionalidad. Se elimina
+  el estado y la UI asociada; el panel ahora solo muestra el QR.
+- **`ChangePassword` con `<input>` / `<button>` sin estilos de diseño**:
+  los campos no usaban los componentes shadcn del resto de la UI, carecían
+  de `autoComplete` y el efecto CSRF (`api.get("/auth/csrf")`) se había
+  vuelto innecesario dado que el interceptor axios ya adjunta el token.
+  Se reescribe con `Input`, `Label` y `Button` de shadcn; se añade
+  `autoComplete="current-password"` y `"new-password"` en los respectivos
+  campos; se elimina el `useEffect` de CSRF innecesario.
+
 [Unreleased]: https://github.com/Kamerr/next-auth-hybrid/compare/main...HEAD
