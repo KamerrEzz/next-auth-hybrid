@@ -73,4 +73,25 @@ y el proyecto adopta [Versionado Semántico](https://semver.org/lang/es/).
   `/[A-Za-z\d@$!%*?&]/` sin `{8,}$`, que validaba con un solo carácter
   válido sin importar la longitud total. Se corrige a `{8,}$`.
 
+### Sprint 2 — Limpieza y calidad
+
+#### Removed
+
+- **SVGs de create-next-app**: se eliminan `public/file.svg`, `globe.svg`,
+  `next.svg`, `vercel.svg` y `window.svg`, que nunca fueron referenciados.
+- **`src/app/(public)/page.tsx`**: página demo que duplicaba la pantalla de
+  login usando axios con URLs hardcoded a `localhost`. Los usuarios ya
+  disponen de `/login` y `/register` con server actions.
+- **`src/components/logout-button.tsx`**: implementación duplicada que usaba
+  la variable pública eliminada en Sprint 0. El componente canónico está en
+  `src/features/auth/components/logout-button.tsx`.
+
+#### Changed (deps)
+
+- Eliminadas `zustand` (sin store definido) y `tailwindcss-animate`
+  (no se importa directamente; las animaciones las cubre `tw-animate-css`).
+- `@tanstack/react-query-devtools` movido a `devDependencies` y cargado
+  mediante `require()` condicional en `providers.tsx`, evitando que los
+  ~50 KB del panel lleguen al bundle de producción.
+
 [Unreleased]: https://github.com/Kamerr/next-auth-hybrid/compare/main...HEAD
