@@ -16,6 +16,61 @@ const registerSchema = z.object({
     name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').optional(),
 });
 
+type ParsedCookie = {
+    name: string;
+    value: string;
+    path: string;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: 'lax' | 'strict' | 'none';
+    maxAge?: number;
+    expires?: Date;
+};
+
+function splitOnce(input: string, sep: string): [string, string] {
+    const idx = input.indexOf(sep);
+    if (idx < 0) return [input, ''];
+    return [input.slice(0, idx), input.slice(idx + 1)];
+}
+
+function parseSetCookie(raw: string): ParsedCookie | null {
+    const [pair, ...attrs] = raw.split(';');
+    const [rawName, rawValue] = splitOnce(pair, '=');
+    const name = rawName.trim();
+    if (!name) return null;
+    const value = rawValue.trim();
+
+    const parsed: ParsedCookie = { name, value, path: '/' };
+    for (const attr of attrs) {
+        const [k, v] = splitOnce(attr.trim(), '=');
+        const key = k.toLowerCase();
+        const val = v.trim();
+        if (key === 'path') parsed.path = val || '/';
+        else if (key === 'httponly') parsed.httpOnly = true;
+        else if (key === 'secure') parsed.secure = true;
+        else if (key === 'samesite') {
+            const s = val.toLowerCase();
+            if (s === 'lax' || s === 'strict' || s === 'none') parsed.sameSite = s;
+        } else if (key === 'max-age') {
+            const n = Number.parseInt(val, 10);
+            if (Number.isFinite(n)) parsed.maxAge = n;
+        } else if (key === 'expires') {
+            const d = new Date(val);
+            if (!Number.isNaN(d.getTime())) parsed.expires = d;
+        }
+    }
+    return parsed;
+}
+
+async function setAuthCookies(response: Response) {
+    const cookieStore = await cookies();
+    const setCookieHeader = response.headers.getSetCookie();
+    for (const cookieString of setCookieHeader) {
+        const parsed = parseSetCookie(cookieString);
+        if (parsed) cookieStore.set(parsed);
+    }
+}
+
 export async function registerAction(prevState: any, formData: FormData) {
     const parsed = registerSchema.safeParse({
         email: formData.get('email'),
@@ -47,5 +102,6 @@ export async function registerAction(prevState: any, formData: FormData) {
         return { error: 'Error al crear la cuenta. Inténtalo de nuevo.' };
     }
 
+    await setAuthCookies(response);
     redirect('/dashboard');
 }
